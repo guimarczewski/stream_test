@@ -12,7 +12,7 @@ class AmazonS3Uploader:
         self.s3_client = FilesConnection('s3')
 
     def load_credentials(self):
-        self.s3_client.set_credentials(aws_access_key_id, aws_secret_access_key)
+        self.s3_client.set_credentials()
 
     def upload_file(self, bucket_name, uploaded_file):
         if self.s3_client is not None:
