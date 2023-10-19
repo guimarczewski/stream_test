@@ -2,6 +2,10 @@ streamlit
 google-auth
 pandas
 google-cloud-storage==1.38.0
-boto3==1.17.54
-boto==2.49.0
-botocore==1.20.54
+boto3
+botocore
+jmespath
+s3transfer
+python-dateutil
+urllib3
+six
