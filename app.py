@@ -50,6 +50,20 @@ class GoogleCloudUploader:
         else:
             st.error("Error: Google Cloud credentials not loaded")
 
+class UploadFileTab:
+    def __init__(self, uploader):
+        self.uploader = uploader
+        uploaded_credentials = st.file_uploader("Upload JSON credentials file")
+        bucket_name = st.text_input("Bucket Name")
+        uploaded_file = st.file_uploader("Upload any file")
+
+        if uploaded_credentials:
+            self.uploader.load_credentials(uploaded_credentials)
+
+        if uploaded_file:
+            if st.button("Upload"):
+                self.uploader.upload_file(bucket_name, uploaded_file)
+
 class UploadCSVTab:
     def __init__(self, uploader):
         self.uploader = uploader
