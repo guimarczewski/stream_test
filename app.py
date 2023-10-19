@@ -50,6 +50,34 @@ class GoogleCloudUploader:
         else:
             st.error("Error: Google Cloud credentials not loaded")
 
+class AmazonS3Uploader:
+    def __init__(self):
+        st.title("Upload Files to Amazon S3")
+        self.s3_client = None
+
+    def load_credentials(self, aws_access_key_id, aws_secret_access_key):
+        try:
+            self.s3_client = boto3.client(
+                's3',
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key
+            )
+            st.success("Amazon S3 credentials loaded successfully!")
+        except Exception as e:
+            st.error(f"Error loading Amazon S3 credentials: {e}")
+
+    def upload_file(self, bucket_name, uploaded_file):
+        if self.s3_client is not None:
+            try:
+                self.s3_client.upload_fileobj(uploaded_file, bucket_name, uploaded_file.name)
+                st.success("Upload to Amazon S3 completed successfully!")
+            except NoCredentialsError:
+                st.error("No Amazon S3 credentials provided. Please upload the correct credentials.")
+            except Exception as e:
+                st.error(f"Error uploading to Amazon S3: {e}")
+        else:
+            st.error("Error: Amazon S3 credentials not loaded")
+
 class UploadFileTab:
     def __init__(self, uploader):
         self.uploader = uploader
@@ -111,13 +139,21 @@ class UploadCSVTab:
 
 
 def main():
+
+    selected_tab_cloud = st.sidebar.selectbox("Select a Cloud:", ["AWS S3", "Google Cloud Storage"])
+
+    if selected_tab_cloud == "AWS S3":
+        uploader = GoogleCloudUploader()
+    elif selected_tab_cloud == "Google Cloud Storage":
+        uploader = AmazonS3Uploader()
+
     selected_tab = st.sidebar.selectbox("Select a tab:", ["Upload File", "Upload CSV with validation"])
-    uploader = GoogleCloudUploader()
 
     if selected_tab == "Upload File":
         UploadFileTab(uploader)
     elif selected_tab == "Upload CSV with validation":
         UploadCSVTab(uploader)
+
 
 if __name__ == "__main__":
     main()
