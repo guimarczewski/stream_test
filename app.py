@@ -12,8 +12,6 @@ class AmazonS3Uploader:
         self.s3_client = FilesConnection('s3')
 
     def load_credentials(self):
-        aws_access_key_id = st.text_input("AWS Access Key ID")
-        aws_secret_access_key = st.text_input("AWS Secret Access Key")
         self.s3_client.set_credentials(aws_access_key_id, aws_secret_access_key)
 
     def upload_file(self, bucket_name, uploaded_file):
