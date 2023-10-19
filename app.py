@@ -75,8 +75,34 @@ class UploadCSVTab:
             self.uploader.load_credentials(uploaded_credentials)
 
         if uploaded_file:
-            if st.button("Upload"):
-                self.uploader.upload_file(bucket_name, uploaded_file)
+            if self.validate_csv_file(uploaded_file):
+                if st.button("Upload"):
+                    self.uploader.upload_file(bucket_name, uploaded_file)
+            else:
+                self.show_error_message()
+
+    def validate_csv_file(self, uploaded_file):
+        # Verifique se a extensão do arquivo é `.csv`.
+        if uploaded_file.name.endswith(".csv"):
+            # Verifique se o arquivo contém as colunas `data`, `lat`, `lon`, `vehicle`.
+            try:
+                df = pd.read_csv(uploaded_file)
+                if all(col in df.columns for col in ["data", "lat", "lon", "vehicle"]):
+                    # Verifique se o arquivo contém mais de 10 linhas.
+                    if len(df) > 10:
+                        return True
+            except Exception as e:
+                pass
+        return False
+
+    def show_error_message(self, error_type):
+        if error_type == "invalid_extension":
+            st.error("The file must be a CSV file.")
+        elif error_type == "missing_columns":
+            st.error("The CSV file must contain the following columns: data, lat, lon, vehicle.")
+        elif error_type == "too_few_rows":
+            st.error("The CSV file must contain at least 11 rows.")
+
 
 def main():
     selected_tab = st.sidebar.selectbox("Select a tab:", ["Upload File", "Upload CSV with validation"])
