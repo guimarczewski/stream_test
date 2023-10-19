@@ -4,8 +4,9 @@ import json
 import tempfile
 from google.cloud import storage
 from google.oauth2 import service_account
-import boto3
 from botocore.exceptions import NoCredentialsError
+import boto3
+
 
 class GoogleCloudUploader:
     def __init__(self):
