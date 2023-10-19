@@ -1,9 +1,11 @@
 import streamlit as st
-from google.cloud import storage
 import pandas as pd
 import json
-from google.oauth2 import service_account
 import tempfile
+from google.cloud import storage
+from google.oauth2 import service_account
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 class GoogleCloudUploader:
     def __init__(self):
@@ -15,9 +17,9 @@ class GoogleCloudUploader:
             credentials_data = json.load(uploaded_credentials)
             credentials = service_account.Credentials.from_service_account_info(credentials_data)
             self.storage_client = storage.Client(credentials=credentials)
-            st.success("Credentials loaded successfully!")
+            st.success("Google Cloud credentials loaded successfully!")
         except Exception as e:
-            st.error(f"Error loading credentials: {e}")
+            st.error(f"Error loading Google Cloud credentials: {e}")
 
     def upload_file(self, bucket_name, uploaded_file):
         if self.storage_client is not None:
@@ -36,15 +38,15 @@ class GoogleCloudUploader:
                 if replace_existing:
                     try:
                         blob.upload_from_filename(temp_file.name)
-                        st.success("Upload completed successfully!")
+                        st.success("Upload to Google Cloud completed successfully!")
                     except Exception as e:
                         st.error(e)
                 elif cancel_upload:
-                    st.warning("Upload canceled. The existing file will not be replaced.")
+                    st.warning("Upload to Google Cloud canceled. The existing file will not be replaced.")
             else:
                 try:
                     blob.upload_from_filename(temp_file.name)
-                    st.success("Upload completed successfully!")
+                    st.success("Upload to Google Cloud completed successfully!")
                 except Exception as e:
                     st.error(e)
         else:
@@ -142,9 +144,9 @@ def main():
 
     selected_tab_cloud = st.sidebar.selectbox("Select a Cloud:", ["AWS S3", "Google Cloud Storage"])
 
-    if selected_tab_cloud == "AWS S3":
+    if selected_tab_cloud == "Google Cloud Storage":
         uploader = GoogleCloudUploader()
-    elif selected_tab_cloud == "Google Cloud Storage":
+    elif selected_tab_cloud == "AWS S3":
         uploader = AmazonS3Uploader()
 
     selected_tab = st.sidebar.selectbox("Select a tab:", ["Upload File", "Upload CSV with validation"])
