@@ -162,6 +162,10 @@ def main():
         uploader = GoogleCloudUploader()
     elif selected_tab_cloud == "AWS S3":
         uploader = AmazonS3Uploader()
+        aws_access_key_id = st.text_input("AWS Access Key ID")
+        aws_secret_access_key = st.text_input("AWS Secret Access Key")
+        uploader.load_credentials(aws_access_key_id, aws_secret_access_key)
+        
 
     selected_tab = st.sidebar.selectbox("Select a tab:", ["Upload File", "Upload CSV with validation"])
 
