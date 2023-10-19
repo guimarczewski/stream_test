@@ -4,8 +4,47 @@ import json
 import tempfile
 from google.cloud import storage
 from google.oauth2 import service_account
-from botocore.exceptions import NoCredentialsError
-import boto3
+from st_files_connection import FilesConnection
+
+class AmazonS3Uploader:
+    def __init__(self):
+        st.title("Upload Files to Amazon S3")
+        self.s3_client = FilesConnection('s3')
+
+    def load_credentials(self):
+        aws_access_key_id, aws_secret_access_key = self.s3_client.get_credentials()
+        self.s3_client.set_credentials(aws_access_key_id, aws_secret_access_key)
+
+    def upload_file(self, bucket_name, uploaded_file):
+        if self.s3_client is not None:
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                temp_file.write(uploaded_file.read())
+
+            blob_name = uploaded_file.name
+            bucket = self.s3_client.bucket(bucket_name)
+            blob = bucket.blob(blob_name)
+
+            if blob.exists():
+                st.warning("The file already exists. Do you want to replace it?")
+                replace_existing = st.button("Replace")
+                cancel_upload = st.button("Cancel")
+
+                if replace_existing:
+                    try:
+                        blob.upload_from_filename(temp_file.name)
+                        st.success("Upload to Amazon S3 completed successfully!")
+                    except Exception as e:
+                        st.error(e)
+                elif cancel_upload:
+                    st.warning("Upload to Amazon S3 canceled. The existing file will not be replaced.")
+            else:
+                try:
+                    blob.upload_from_filename(temp_file.name)
+                    st.success("Upload to Amazon S3 completed successfully!")
+                except Exception as e:
+                    st.error(e)
+        else:
+            st.error("Error: Amazon S3 credentials not loaded")
 
 
 class GoogleCloudUploader:
@@ -53,33 +92,6 @@ class GoogleCloudUploader:
         else:
             st.error("Error: Google Cloud credentials not loaded")
 
-class AmazonS3Uploader:
-    def __init__(self):
-        st.title("Upload Files to Amazon S3")
-        self.s3_client = None
-
-    def load_credentials(self, aws_access_key_id, aws_secret_access_key):
-        try:
-            self.s3_client = boto3.client(
-                's3',
-                aws_access_key_id=aws_access_key_id,
-                aws_secret_access_key=aws_secret_access_key
-            )
-            st.success("Amazon S3 credentials loaded successfully!")
-        except Exception as e:
-            st.error(f"Error loading Amazon S3 credentials: {e}")
-
-    def upload_file(self, bucket_name, uploaded_file):
-        if self.s3_client is not None:
-            try:
-                self.s3_client.upload_fileobj(uploaded_file, bucket_name, uploaded_file.name)
-                st.success("Upload to Amazon S3 completed successfully!")
-            except NoCredentialsError:
-                st.error("No Amazon S3 credentials provided. Please upload the correct credentials.")
-            except Exception as e:
-                st.error(f"Error uploading to Amazon S3: {e}")
-        else:
-            st.error("Error: Amazon S3 credentials not loaded")
 
 class UploadFileTab:
     def __init__(self, uploader):
