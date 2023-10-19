@@ -50,20 +50,6 @@ class GoogleCloudUploader:
         else:
             st.error("Error: Google Cloud credentials not loaded")
 
-class UploadFileTab:
-    def __init__(self, uploader):
-        self.uploader = uploader
-        uploaded_credentials = st.file_uploader("Upload JSON credentials file")
-        bucket_name = st.text_input("Bucket Name")
-        uploaded_file = st.file_uploader("Upload any file")
-
-        if uploaded_credentials:
-            self.uploader.load_credentials(uploaded_credentials)
-
-        if uploaded_file:
-            if st.button("Upload"):
-                self.uploader.upload_file(bucket_name, uploaded_file)
-
 class UploadCSVTab:
     def __init__(self, uploader):
         self.uploader = uploader
@@ -75,25 +61,31 @@ class UploadCSVTab:
             self.uploader.load_credentials(uploaded_credentials)
 
         if uploaded_file:
-            if self.validate_csv_file(uploaded_file):
+            error_type = self.validate_csv_file(uploaded_file)
+            if error_type is not True:
+                self.show_error_message(error_type)
+            else:
                 if st.button("Upload"):
                     self.uploader.upload_file(bucket_name, uploaded_file)
-            else:
-                self.show_error_message()
 
     def validate_csv_file(self, uploaded_file):
         # Verifique se a extensão do arquivo é `.csv`.
-        if uploaded_file.name.endswith(".csv"):
-            # Verifique se o arquivo contém as colunas `data`, `lat`, `lon`, `vehicle`.
-            try:
-                df = pd.read_csv(uploaded_file)
-                if all(col in df.columns for col in ["data", "lat", "lon", "vehicle"]):
-                    # Verifique se o arquivo contém mais de 10 linhas.
-                    if len(df) > 10:
-                        return True
-            except Exception as e:
-                pass
-        return False
+        if not uploaded_file.name.endswith(".csv"):
+            return "invalid_extension"
+
+        # Verifique se o arquivo contém as colunas `data`, `lat`, `lon`, `vehicle`.
+        try:
+            df = pd.read_csv(uploaded_file)
+            if not all(col in df.columns for col in ["data", "lat", "lon", "vehicle"]):
+                return "missing_columns"
+        except Exception as e:
+            pass
+
+        # Verifique se o arquivo contém mais de 10 linhas.
+        if len(df) <= 10:
+            return "too_few_rows"
+
+        return True
 
     def show_error_message(self, error_type):
         if error_type == "invalid_extension":
