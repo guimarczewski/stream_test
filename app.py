@@ -159,7 +159,8 @@ class UploadFileTab_aws:
 
         if uploaded_file:
             if st.button("Upload"):
-                self.uploader.s3_client.bucket(bucket_name).upload_fileobj(uploaded_file)
+                s3 = boto3.resource("s3")
+                s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
 class UploadCSVTab_aws:
     def __init__(self, uploader):
@@ -173,7 +174,8 @@ class UploadCSVTab_aws:
                 self.show_error_message(error_type)
             else:
                 if st.button("Upload"):
-                    self.uploader.s3_client.bucket(bucket_name).upload_fileobj(uploaded_file.read())
+                    s3 = boto3.resource("s3")
+                    s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
     def validate_csv_file(self, uploaded_file):
         # Verifique se a extensão do arquivo é `.csv`.
@@ -201,6 +203,7 @@ class UploadCSVTab_aws:
             st.error("The CSV file must contain the following columns: data, lat, lon, vehicle.")
         elif error_type == "too_few_rows":
             st.error("The CSV file must contain at least 11 rows.")
+
 
 
 def main():
