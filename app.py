@@ -154,7 +154,7 @@ class UploadFileTab_aws:
     def __init__(self, uploader):
         self.uploader = uploader
         aws_access_key_id_input = st.text_input("AWS Access Key ID")
-        aws_secret_access_key_input = st.text_input("AWS Secret Access Key")
+        aws_secret_access_key_input = st.text_input("AWS Secret Access Key", type="password")
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload any file")
 
@@ -167,7 +167,7 @@ class UploadCSVTab_aws:
     def __init__(self, uploader):
         self.uploader = uploader
         aws_access_key_id_input = st.text_input("AWS Access Key ID")
-        aws_secret_access_key_input = st.text_input("AWS Secret Access Key")
+        aws_secret_access_key_input = st.text_input("AWS Secret Access Key", type="password")
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload CSV file")
 
