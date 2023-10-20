@@ -187,7 +187,7 @@ class UploadCSVTab_aws:
                 # Verificar se o arquivo existe no S3.
                 s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
                 s3_client = boto3.client('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
-                if s3_client.head_object(bucket_name, uploaded_file_name):
+                if self.check_file_exists(s3_client, bucket_name, uploaded_file_name):
                     # O arquivo existe no S3.
                     st.warning("The file already exists. Do you want to replace it?")
                     replace_existing = st.button("Replace")
@@ -225,6 +225,18 @@ class UploadCSVTab_aws:
 
         return True
 
+
+    def check_file_exists(conn, bucket, key):
+    try:
+        conn.head_object(Bucket=bucket, Key=key)
+        return True
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            return False
+        else:
+            # Handle other exceptions as needed
+            return False
+            
     def show_error_message(self, error_type):
         if error_type == "invalid_extension":
             st.error("The file must be a CSV file.")
