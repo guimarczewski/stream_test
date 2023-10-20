@@ -15,9 +15,10 @@ class AmazonS3Uploader:
     def load_credentials(self):
         self.s3_client.set_credentials()
 
-    def file_exists(self, bucket_name, uploaded_file):
+    def file_exists(self, bucket_name, key):
+        
         try:
-            self.s3_client.head_object(Bucket=bucket_name, Key=uploaded_file)
+            self.s3_client.head_object(Bucket=bucket_name, Key=key)
             return True
         except Exception as e:
             return False
@@ -28,7 +29,10 @@ class AmazonS3Uploader:
                 temp_file.write(uploaded_file.read())
 
             blob_name = uploaded_file.name
-            if self.file_exists(bucket_name, blob_name):
+
+            file_exists = self.file_exists(bucket_name, blob_name)
+            
+            if file_exists:
                 st.warning("The file already exists. Do you want to replace it?")
                 replace_existing = st.button("Replace")
                 cancel_upload = st.button("Cancel")
