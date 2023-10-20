@@ -220,7 +220,7 @@ def main():
         UploadFileTab_gcs(uploader)
     elif selected_tab == "Upload CSV with validation" and selected_tab_cloud == "Google Cloud Storage":
         UploadCSVTab_gcs(uploader)
-    elif selected_tab_aws == "Upload File" and selected_tab_cloud == "AWS S3":
+    elif selected_tab == "Upload File" and selected_tab_cloud == "AWS S3":
         UploadFileTab(uploader)
     elif selected_tab == "Upload CSV with validation"and selected_tab_cloud == "AWS S3":
         UploadCSVTab_aws(uploader)
