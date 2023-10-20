@@ -227,15 +227,15 @@ class UploadCSVTab_aws:
 
 
     def check_file_exists(conn, bucket, key):
-    try:
-        conn.head_object(Bucket=bucket, Key=key)
-        return True
-    except botocore.exceptions.ClientError as e:
-        if e.response['Error']['Code'] == "404":
-            return False
-        else:
-            # Handle other exceptions as needed
-            return False
+        try:
+            conn.head_object(Bucket=bucket, Key=key)
+            return True
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                return False
+            else:
+                # Handle other exceptions as needed
+                return False
             
     def show_error_message(self, error_type):
         if error_type == "invalid_extension":
