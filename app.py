@@ -25,7 +25,7 @@ class AmazonS3Uploader:
             bucket = self.s3_client.bucket(bucket_name)
             blob = bucket.blob(blob_name)
 
-            path = bucket + '/' + uploaded_file.name
+            path = bucket_name + '/' + uploaded_file.name
 
             if s3.exists(path):
                 st.warning("The file already exists. Do you want to replace it?")
