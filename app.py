@@ -29,10 +29,8 @@ class AmazonS3Uploader:
                 temp_file.write(uploaded_file.read())
 
             blob_name = uploaded_file.name
-            st.warning(blob_name)
-            st.warning(bucket_name)
             
-            if self.file_exists(bucket_name, blob_name):
+            if self.file_exists(bucket_name, uploaded_file.name):
                 st.warning("The file already exists. Do you want to replace it?")
                 replace_existing = st.button("Replace")
                 cancel_upload = st.button("Cancel")
@@ -168,7 +166,7 @@ class UploadFileTab_aws:
         uploaded_file = st.file_uploader("Upload any file")
 
         if uploaded_file:
-            if st.button("Upload"+uploaded_file.name):
+            if st.button("Upload"+bucket_name):
                 s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
                 s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
