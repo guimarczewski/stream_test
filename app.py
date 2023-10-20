@@ -8,7 +8,7 @@ from st_files_connection import FilesConnection
 import boto3
 
 class AmazonS3Uploader:
-    def __init__(self):
+    def __init__(self, aws_access_key_id, aws_secret_access_key):
         st.title("Upload Files to Amazon S3")
         self.s3_client = FilesConnection('s3')
 
