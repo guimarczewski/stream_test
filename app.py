@@ -10,8 +10,6 @@ import boto3
 class AmazonS3Uploader:
     def __init__(self):
         st.title("Upload Files to Amazon S3")
-        aws_access_key_id_input = st.text_input("AWS Access Key ID")
-        aws_secret_access_key_input = st.text_input("AWS Secret Access Key")
         self.s3_client = FilesConnection('s3')
 
     def load_credentials(self):
@@ -227,7 +225,7 @@ def main():
     elif selected_tab == "Upload File" and selected_tab_cloud == "AWS S3":
         UploadFileTab_aws(uploader, aws_access_key_id_input, aws_secret_access_key_input)
     elif selected_tab == "Upload CSV with validation" and selected_tab_cloud == "AWS S3":
-        UploadCSVTab_aws(uploader, aws_access_key_id_input, aws_secret_access_key_input)
+        UploadCSVTab_aws(uploader)
 
 if __name__ == "__main__":
     main()
