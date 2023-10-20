@@ -168,11 +168,9 @@ class UploadFileTab_aws:
         uploaded_file = st.file_uploader("Upload any file")
 
         if uploaded_file:
-            if st.button("Upload"):
+            if st.button("Upload"+blob_name):
                 s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
                 s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
-        st.warning(blob_name)
-        st.warning(uploaded_file.name)
 
 class UploadCSVTab_aws:
     def __init__(self, uploader):
