@@ -24,8 +24,13 @@ class AmazonS3Uploader:
             bucket = self.s3_client.bucket(bucket_name)
             blob = bucket.blob(blob_name)
 
-            try:
-                resp = s3.head_object(Bucket=bucket_name, Key=blob_name)
+            # Listar todos os objetos no bucket
+            blobs = list(bucket.list_blobs())
+
+            # Verifique se o arquivo já existe no bucket
+            file_exists = any(blob.name == blob_name for blob in blobs)
+
+            if file_exists:
                 st.warning("The file already exists. Do you want to replace it?")
                 replace_existing = st.button("Replace")
                 cancel_upload = st.button("Cancel")
@@ -38,7 +43,7 @@ class AmazonS3Uploader:
                         st.error(e)
                 elif cancel_upload:
                     st.warning("Upload to Amazon S3 canceled. The existing file will not be replaced.")
-            except s3.exceptions.ClientError as e:
+            else:
                 try:
                     blob.upload_from_filename(temp_file.name)
                     st.success("Upload to Amazon S3 completed successfully!")
