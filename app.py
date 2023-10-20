@@ -10,6 +10,8 @@ import boto3
 class AmazonS3Uploader:
     def __init__(self, aws_access_key_id_input, aws_secret_access_key_input):
         st.title("Upload Files to Amazon S3")
+        self.aws_access_key_id_input = aws_access_key_id_input
+        self.aws_secret_access_key_input = aws_secret_access_key_input
         self.s3_client = FilesConnection('s3')
 
     def load_credentials(self):
@@ -45,7 +47,6 @@ class AmazonS3Uploader:
                     st.error(e)
         else:
             st.error("Error: Amazon S3 credentials not loaded")
-
 
 class GoogleCloudUploader:
     def __init__(self):
@@ -91,7 +92,6 @@ class GoogleCloudUploader:
                     st.error(e)
         else:
             st.error("Error: Google Cloud credentials not loaded")
-
 
 class UploadFileTab_gcs:
     def __init__(self, uploader):
@@ -153,19 +153,23 @@ class UploadCSVTab_gcs:
             st.error("The CSV file must contain at least 11 rows.")
 
 class UploadFileTab_aws:
-    def __init__(self, uploader):
+    def __init__(self, uploader, aws_access_key_id_input, aws_secret_access_key_input):
         self.uploader = uploader
+        self.aws_access_key_id_input = aws_access_key_id_input
+        self.aws_secret_access_key_input = aws_secret_access_key_input
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload any file")
 
         if uploaded_file:
             if st.button("Upload"):
-                s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key= aws_secret_access_key_input)
+                s3 = boto3.resource('s3', aws_access_key_id=self.aws_access_key_id_input, aws_secret_access_key=self.aws_secret_access_key_input)
                 s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
 class UploadCSVTab_aws:
-    def __init__(self, uploader):
+    def __init__(self, uploader, aws_access_key_id_input, aws_secret_access_key_input):
         self.uploader = uploader
+        self.aws_access_key_id_input = aws_access_key_id_input
+        self.aws_secret_access_key_input = aws_secret_access_key_input
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload CSV file")
 
@@ -175,7 +179,7 @@ class UploadCSVTab_aws:
                 self.show_error_message(error_type)
             else:
                 if st.button("Upload"):
-                    s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key= aws_secret_access_key_input)
+                    s3 = boto3.resource('s3', aws_access_key_id=self.aws_access_key_id_input, aws_secret_access_key=self.aws_secret_access_key_input)
                     s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
     def validate_csv_file(self, uploaded_file):
@@ -205,8 +209,6 @@ class UploadCSVTab_aws:
         elif error_type == "too_few_rows":
             st.error("The CSV file must contain at least 11 rows.")
 
-
-
 def main():
 
     selected_tab_cloud = st.sidebar.selectbox("Select a Cloud:", ["AWS S3", "Google Cloud Storage"])
@@ -217,8 +219,7 @@ def main():
         aws_access_key_id_input = st.text_input("AWS Access Key ID")
         aws_secret_access_key_input = st.text_input("AWS Secret Access Key")
         load_credentials = st.button("Load Credentials")
-        if load_credentials:
-            uploader = AmazonS3Uploader(aws_access_key_id_input,aws_secret_access_key_input)
+        uploader = AmazonS3Uploader(aws_access_key_id_input, aws_secret_access_key_input)
         
     selected_tab = st.sidebar.selectbox("Select a tab:", ["Upload File", "Upload CSV with validation"])
 
@@ -227,10 +228,9 @@ def main():
     elif selected_tab == "Upload CSV with validation" and selected_tab_cloud == "Google Cloud Storage":
         UploadCSVTab_gcs(uploader)
     elif selected_tab == "Upload File" and selected_tab_cloud == "AWS S3":
-        UploadCSVTab_aws(uploader)
-    elif selected_tab == "Upload CSV with validation"and selected_tab_cloud == "AWS S3":
-        UploadCSVTab_aws(uploader)
-
+        UploadFileTab_aws(uploader, aws_access_key_id_input, aws_secret_access_key_input)
+    elif selected_tab == "Upload CSV with validation" and selected_tab_cloud == "AWS S3":
+        UploadCSVTab_aws(uploader, aws_access_key_id_input, aws_secret_access_key_input)
 
 if __name__ == "__main__":
     main()
