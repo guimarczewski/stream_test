@@ -173,7 +173,7 @@ class UploadCSVTab_aws:
                 self.show_error_message(error_type)
             else:
                 if st.button("Upload"):
-                    self.uploader.s3_client.bucket(bucket_name).upload_fileobj(uploaded_file)
+                    self.uploader.s3_client.bucket(bucket_name).upload_fileobj(uploaded_file.read())
 
     def validate_csv_file(self, uploaded_file):
         # Verifique se a extensão do arquivo é `.csv`.
