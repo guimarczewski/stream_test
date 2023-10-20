@@ -5,6 +5,7 @@ import tempfile
 from google.cloud import storage
 from google.oauth2 import service_account
 from st_files_connection import FilesConnection
+import boto3
 
 class AmazonS3Uploader:
     def __init__(self):
