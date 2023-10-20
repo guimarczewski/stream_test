@@ -25,7 +25,7 @@ class AmazonS3Uploader:
             blob = bucket.blob(blob_name)
 
             try:
-                resp = s3.head_object(Bucket=bucket, Key=blob_name)
+                resp = s3.head_object(Bucket=bucket_name, Key=blob_name)
                 st.warning("The file already exists. Do you want to replace it?")
                 replace_existing = st.button("Replace")
                 cancel_upload = st.button("Cancel")
