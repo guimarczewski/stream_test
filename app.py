@@ -16,15 +16,15 @@ class AmazonS3Uploader:
     def load_credentials(self):
         self.s3_client.set_credentials()
 
-    def upload_file(self, bucket_name, uploaded_file):
+    def upload_file(self, bucket_name, uploaded_file,s3):
         if self.s3_client is not None:
             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
                 temp_file.write(uploaded_file.read())
 
             blob_name = uploaded_file.name
             bucket = self.s3_client.bucket(bucket_name)
-            blob = bucket.blob(blob_name)
-
+            blob = bucket.blob(blob_name)    
+            
             path = bucket_name + '/' + uploaded_file.name
 
             if s3.exists(path):
@@ -161,6 +161,8 @@ class UploadFileTab_aws:
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload any file")
 
+        s3 = s3fs.S3FileSystem(anon=False, key=aws_access_key_id_input, secret=aws_secret_access_key_input)
+        
         if uploaded_file:
             if st.button("Upload"):
                 s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
@@ -174,6 +176,8 @@ class UploadCSVTab_aws:
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload CSV file")
 
+        s3 = s3fs.S3FileSystem(anon=False, key=aws_access_key_id_input, secret=aws_secret_access_key_input)
+        
         if uploaded_file:
             error_type = self.validate_csv_file(uploaded_file)
             if error_type is not True:
