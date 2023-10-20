@@ -18,7 +18,7 @@ class AmazonS3Uploader:
     def file_exists(self, bucket_name, key):
         
         try:
-            self.s3.head_object(Bucket=bucket_name, Key=key)
+            self.s3_client.head_object(Bucket=bucket_name, Key=key)
             return True
         except Exception as e:
             return False
@@ -183,9 +183,26 @@ class UploadCSVTab_aws:
             if error_type is not True:
                 self.show_error_message(error_type)
             else:
-                if st.button("Upload"):
-                    s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
+                # Verificar se o arquivo existe no S3.
+                s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
+                if s3.Object(bucket_name, uploaded_file.name).exists():
+                    # O arquivo existe no S3.
+                    st.warning("The file already exists. Do you want to replace it?")
+                    replace_existing = st.button("Replace")
+                    cancel_upload = st.button("Cancel")
+
+                    if replace_existing:
+                        # Substituir o arquivo existente.
+                        s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
+                        st.success("Upload to Amazon S3 completed successfully!")
+                    elif cancel_upload:
+                        # Cancelar o upload.
+                        st.warning("Upload to Amazon S3 canceled. The existing file will not be replaced.")
+                else:
+                    # O arquivo não existe no S3.
+                    # Fazer o upload do arquivo.
                     s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
+                    st.success("Upload to Amazon S3 completed successfully!")
 
     def validate_csv_file(self, uploaded_file):
         # Verifique se a extensão do arquivo é `.csv`.
