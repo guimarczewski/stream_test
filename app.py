@@ -157,12 +157,9 @@ class UploadFileTab_aws:
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload any file")
 
-        if uploaded_credentials:
-            self.uploader.load_credentials(uploaded_credentials)
-
         if uploaded_file:
             if st.button("Upload"):
-                self.uploader.upload_file(bucket_name, uploaded_file)
+                self.uploader.s3_client.bucket(bucket_name).upload_fileobj(uploaded_file)
 
 class UploadCSVTab_aws:
     def __init__(self, uploader):
@@ -170,16 +167,13 @@ class UploadCSVTab_aws:
         bucket_name = st.text_input("Bucket Name")
         uploaded_file = st.file_uploader("Upload CSV file")
 
-        if uploaded_credentials:
-            self.uploader.load_credentials(uploaded_credentials)
-
         if uploaded_file:
             error_type = self.validate_csv_file(uploaded_file)
             if error_type is not True:
                 self.show_error_message(error_type)
             else:
                 if st.button("Upload"):
-                    self.uploader.upload_file(bucket_name, uploaded_file)
+                    self.uploader.s3_client.bucket(bucket_name).upload_fileobj(uploaded_file)
 
     def validate_csv_file(self, uploaded_file):
         # Verifique se a extensão do arquivo é `.csv`.
