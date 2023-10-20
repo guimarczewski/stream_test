@@ -168,7 +168,7 @@ class UploadFileTab_aws:
         uploaded_file = st.file_uploader("Upload any file")
 
         if uploaded_file:
-            if st.button("Upload"+blob_name):
+            if st.button("Upload"+uploaded_file.name):
                 s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
                 s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
