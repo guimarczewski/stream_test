@@ -30,7 +30,7 @@ class AmazonS3Uploader:
 
             blob_name = uploaded_file.name
             
-            if self.file_exists(bucket_name, temp_file.name):
+            if self.file_exists(bucket_name, blob_name):
                 st.warning("The file already exists. Do you want to replace it?")
                 replace_existing = st.button("Replace")
                 cancel_upload = st.button("Cancel")
