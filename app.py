@@ -15,23 +15,27 @@ class AmazonS3Uploader:
     def load_credentials(self):
         self.s3_client.set_credentials()
 
+    def file_exists(self, bucket_name, uploaded_file):
+        try:
+            self.s3_client.head_object(Bucket=bucket_name, Key=uploaded_file)
+            return True
+        except Exception as e:
+            return False
+
     def upload_file(self, bucket_name, uploaded_file):
         if self.s3_client is not None:
             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
                 temp_file.write(uploaded_file.read())
 
             blob_name = uploaded_file.name
-            bucket = self.s3_client.bucket(bucket_name)
-            blob = bucket.blob(blob_name)
-
-            if blob.exists():
+            if self.file_exists(bucket_name, blob_name):
                 st.warning("The file already exists. Do you want to replace it?")
                 replace_existing = st.button("Replace")
                 cancel_upload = st.button("Cancel")
 
                 if replace_existing:
                     try:
-                        blob.upload_from_filename(temp_file.name)
+                        self.s3_client.upload_file(temp_file.name, bucket_name, blob_name)
                         st.success("Upload to Amazon S3 completed successfully!")
                     except Exception as e:
                         st.error(e)
@@ -39,12 +43,13 @@ class AmazonS3Uploader:
                     st.warning("Upload to Amazon S3 canceled. The existing file will not be replaced.")
             else:
                 try:
-                    blob.upload_from_filename(temp_file.name)
+                    self.s3_client.upload_file(temp_file.name, bucket_name, blob_name)
                     st.success("Upload to Amazon S3 completed successfully!")
                 except Exception as e:
                     st.error(e)
         else:
             st.error("Error: Amazon S3 credentials not loaded")
+
 
 class GoogleCloudUploader:
     def __init__(self):
