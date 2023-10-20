@@ -216,7 +216,9 @@ def main():
     elif selected_tab_cloud == "AWS S3":
         aws_access_key_id_input = st.text_input("AWS Access Key ID")
         aws_secret_access_key_input = st.text_input("AWS Secret Access Key")
-        uploader = AmazonS3Uploader(aws_access_key_id_input,aws_secret_access_key_input)
+        load_credentials = st.button("Load Credentials")
+        if load_credentials:
+            uploader = AmazonS3Uploader(aws_access_key_id_input,aws_secret_access_key_input)
         
     selected_tab = st.sidebar.selectbox("Select a tab:", ["Upload File", "Upload CSV with validation"])
 
