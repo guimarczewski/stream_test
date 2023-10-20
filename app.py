@@ -185,7 +185,7 @@ class UploadCSVTab_aws:
             else:
                 # Verificar se o arquivo existe no S3.
                 s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id_input, aws_secret_access_key=aws_secret_access_key_input)
-                if s3.Object(bucket_name, uploaded_file.name).exists():
+                if s3.head_object(bucket_name, uploaded_file.name):
                     # O arquivo existe no S3.
                     st.warning("The file already exists. Do you want to replace it?")
                     replace_existing = st.button("Replace")
