@@ -6,6 +6,7 @@ from google.cloud import storage
 from google.oauth2 import service_account
 from st_files_connection import FilesConnection
 import boto3
+import s3fs
 
 class AmazonS3Uploader:
     def __init__(self):
@@ -24,13 +25,9 @@ class AmazonS3Uploader:
             bucket = self.s3_client.bucket(bucket_name)
             blob = bucket.blob(blob_name)
 
-            # Listar todos os objetos no bucket
-            blobs = list(bucket.list_blobs())
+            path = bucket + '/' + uploaded_file.name
 
-            # Verifique se o arquivo já existe no bucket
-            file_exists = any(blob.name == blob_name for blob in blobs)
-
-            if file_exists:
+            if s3.exists(path):
                 st.warning("The file already exists. Do you want to replace it?")
                 replace_existing = st.button("Replace")
                 cancel_upload = st.button("Cancel")
