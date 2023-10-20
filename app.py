@@ -160,7 +160,7 @@ class UploadFileTab_aws:
 
         if uploaded_file:
             if st.button("Upload"):
-                s3 = boto3.resource("s3")
+                s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key= aws_secret_access_key)
                 s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
 class UploadCSVTab_aws:
@@ -175,7 +175,7 @@ class UploadCSVTab_aws:
                 self.show_error_message(error_type)
             else:
                 if st.button("Upload"):
-                    s3 = boto3.resource("s3")
+                    s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key= aws_secret_access_key)
                     s3.Object(bucket_name, uploaded_file.name).put(Body=uploaded_file.read())
 
     def validate_csv_file(self, uploaded_file):
